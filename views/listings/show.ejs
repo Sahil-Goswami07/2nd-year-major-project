@@ -1,14 +1,8 @@
 <%layout("/layouts/boilerplate")%>
-<<<<<<< HEAD
 <script>
   const mapToken = "<%- process.env.MAP_TOKEN  %>";
   const listing = <%- JSON.stringify(listing) %>;
 </script>
-=======
-<Script>
-  const mapToken="<%=process.env.MAP_TOKEN %>"
-</Script>
->>>>>>> 7c5b89c82e1841557ad89e3c0c6a18e99ef73149
   <div class="row mt-3">
     <div class="col-8 offset-2">
       <h3>
@@ -39,12 +33,8 @@
       </div>
     </div>
     <br />
-
-<<<<<<< HEAD
-    <% if(currUser && currUser._id.equals(listing.owner._id)) { %>     
-=======
+ 
      <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
->>>>>>> 7c5b89c82e1841557ad89e3c0c6a18e99ef73149
       <div class="btns">
         <a href="/listings/<%=listing._id %>/edit" class="btn btn-dark col-1 offset-2 edit-btn">Edit </a>
         <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE">
