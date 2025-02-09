@@ -1,10 +1,15 @@
 
-    // let mapToken=mapToken
-    // console.log(mapToken);
-    maptilersdk.config.apiKey = mapToken;
-    const map = new maptilersdk.Map({
-      container: 'map', // container's id or the HTML element to render the map
-      style: maptilersdk.MapStyle.STREETS,
-      center: [77.2088, 28.6139], // starting position [lng, lat]
-      zoom: 14, // starting zoom
-    });
+	mapboxgl.accessToken = mapToken || process.env.MAP_TOKEN;
+  const map = new mapboxgl.Map({
+    container: "map", // container ID
+    center: listing.geometry.coordinates , // starting position [lng, lat]. Note that lat must be set between -90 and 90
+    zoom: 9 // starting zoom
+});
+const marker = new mapboxgl.Marker({ color:"Red"})
+.setLngLat(listing.geometry.coordinates)
+.setPopup(new mapboxgl.Popup({offset:25}).setHTML(
+    `<h4>${listing.title}</h4><p>Exact location will be provided after booking!</p>`
+)
+)
+.addTo(map);
+

@@ -47,7 +47,7 @@ const store = MongoStore.create({
   crypto:{
     secret: process.env.SECRET,
   },
-  touchAfter: 24*3600
+  touchAfter: 7*24*3600
 })
 
 store.on("error", ()=>{
@@ -115,4 +115,6 @@ app.listen(4000, () => {
 });
 
 
-
+// app.use((req, res, next) => {
+//   res.sendFile(path.join(__dirname, "public", "index.html"));
+// });

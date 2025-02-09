@@ -1,4 +1,7 @@
 const Listing = require("../models/listing");
+const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapToken = process.env.MAP_TOKEN;
+const geocodingClient = mbxGeocoding({accessToken : mapToken})
 
 module.exports.index = async (req, res) => {
   const allListings = await Listing.find({});
@@ -27,16 +30,29 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
- let url = req.file.path
- let filename=req.file.filename
-  // let{id}=req.params;
-  const newListing = new Listing(req.body.listing);
-  newListing.owner = req.user._id;
-  newListing.image={url,filename}
-  await newListing.save();
-  req.flash("success", "new Listing saved successfully");
-  res.redirect("/listings");
-};
+  let response = await geocodingClient.forwardGeocode({
+     query: req.body.listing.location,
+    // query:"New Delhi, India",
+     limit: 1,
+  })
+    .send()
+//  console.log(response.body.features[0].geometry);
+ // res.send("done!");
+ // const response = await geocoder.geocode(req.body.listing.location);
+    
+     let url = req.file.path;
+     let filename = req.file.filename;
+     let newlisting = new Listing(req.body.listing);
+     console.log(req.user);
+     newlisting.owner = req.user._id;
+     newlisting.image = {url , filename};
+ 
+     newlisting.geometry = response.body.features[0].geometry;
+    
+     await newlisting.save();
+     req.flash("success", "New listing created!");
+     res.redirect("/listings");
+ };
 
 module.exports.renderEditForm = async (req, res) => {
   let { id } = req.params;
@@ -68,6 +84,11 @@ module.exports.updateListing = async (req, res) => {
     }
     req.flash("success", " Listing updated ");
     res.redirect(`/listings/${id}`);
+
+     // listing.geometry = response[0];
+
+     req.flash("success", "Listing Updated!");
+     res.redirect(`/listings/${id}`);
   };
 
 module.exports.deleteListing = async (req, res) => {
@@ -76,4 +97,26 @@ module.exports.deleteListing = async (req, res) => {
   // console.log(deletedListing);
   req.flash("success", " Listing deleted successfully");
   res.redirect("/listings");
+};
+
+module.exports.filter = async(req,res,next)=>{
+  let {id} = req.params;
+  let allListings = await Listing.find({category: id});
+  if(allListings.length != 0){
+      res.render("listings/index.ejs", { allListings });
+  }else{
+      req.flash("error",`No listing with ${id}`);
+      res.redirect("/listings")
+  }
+}
+
+
+module.exports.search = async (req, res) => {
+  // let { location } = req.query;
+  console.log("Searching...");
+  const { place } =  req.query
+  console.log(req.query);
+  const allListings = await Listing.find({country:place });
+  console.log(allListings);
+  res.render("./listings/index.ejs", { allListings });
 };

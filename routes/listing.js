@@ -7,6 +7,11 @@ const listingController = require("../controllers/listings.js");
 const multer = require("multer");
 const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage });
+const { route } = require("./user.js");
+
+
+router.get("/filter/:id",wrapAsync(listingController.filter));
+router.get("/search", wrapAsync(listingController.search));
 
 router
   .route("/")
@@ -14,9 +19,9 @@ router
   .get(wrapAsync(listingController.index))
   // create route
   .post(
-    isLoggedIn,
-    upload.single("listing[image]"),
+    isLoggedIn,  
     validateListing, 
+    upload.single("listing[image]"),
     wrapAsync(listingController.createListing)
   )
 
@@ -43,6 +48,7 @@ router.get(
   "/:id/edit",
   isLoggedIn,
   isOwner,
+  // validateListing,
   wrapAsync(listingController.renderEditForm)
 );
 
